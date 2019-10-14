@@ -212,16 +212,22 @@ class SecondState extends State<Second> {
                   if (_formKey.currentState.validate()) {
                     _formKey.currentState.save();
                     try {
-                      // TODO adicionar check connectivity
-                      if (type == 'date') message = '/$month/$day';
-                      if (type == 'random') {
-                        // random
-                        message = '/random';
-                        type = 'trivia';
+                     
+                      var result =  await InternetAddress.lookup('https://numbersapi.p.rapidapi.com');
+                      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+                        if (type == 'date') message = '/$month/$day';
+                        if (type == 'random') {
+                          // random
+                          message = '/random';
+                          type = 'trivia';
+                        }
+                        String hey = await getMessage(message, type);
+                        _showDialog(type, hey);
                       }
-                      String hey = await getMessage(message, type);
-                      _showDialog(type, hey);
+                      
                     } on SocketException {
+                      _showDialog('Ups!', 'Please check your connection');
+                    } on Exception {
                       _showDialog('Ups!', 'Something went wrong!');
                     }
                   }
